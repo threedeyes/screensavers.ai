@@ -4,3 +4,5 @@
  features an option to display accumulating snowdrifts.
 
 ![MainWindow](/Snowfall/screenshot.png)
+
+![MainWindow](/Snowfall/settings.png)
