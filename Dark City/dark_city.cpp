@@ -1,3 +1,15 @@
+/*
+ * Dark City Screen Saver
+ *
+ * This screensaver simulates a dark city with traffic.
+ *
+ * © Claude (version 3.5 Sonnet) by Anthropic
+ *
+ * Designed and implemented by Claude, an AI assistant created by Anthropic,
+ * demonstrating the capabilities of artificial intelligence in software development.
+ * The code was generated based on the user's requirements and best practices for Haiku OS development.
+ */
+
 #include <ScreenSaver.h>
 #include <LayoutBuilder.h>
 #include <GridLayoutBuilder.h>
