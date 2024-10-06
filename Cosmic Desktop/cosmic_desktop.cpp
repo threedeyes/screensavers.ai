@@ -78,7 +78,7 @@ public:
 								CosmicDesktopGLView(BRect frame);
 
 	void						AttachedToWindow();
-	void						Draw(BRect updateRect);
+	void						Draw();
 	void						Advance(float delta);
 	void						SetRotationSpeed(float speed);
 	void						SetWobbleAmplitude(float amplitude);
@@ -136,13 +136,15 @@ CosmicDesktopSaver::StartConfig(BView* view)
 status_t
 CosmicDesktopSaver::StartSaver(BView* view, bool preview)
 {
+	view->SetViewColor(0, 0, 0);
 	if (!fGLView) {
 		BRect bounds = view->Bounds();
 		fGLView = new CosmicDesktopGLView(bounds);
-		view->AddChild(fGLView);
+		fGLView->SetViewColor(0, 0, 0);
 		fGLView->SetPreviewMode(preview);
 		fGLView->SetRotationSpeed(fRotationSpeed);
 		fGLView->SetWobbleAmplitude(fWobbleAmplitude);
+		view->AddChild(fGLView);
 	}
 	SetTickSize(25000);
 	return B_OK;
@@ -185,7 +187,7 @@ CosmicDesktopSaver::Draw(BView* view, int32 frame)
 {
 	if (fGLView) {
 		fGLView->Advance(0.01f);
-		fGLView->Draw(view->Bounds());
+		fGLView->Draw();
 	}
 }
 
@@ -306,8 +308,8 @@ CosmicDesktopConfigView::MessageReceived(BMessage* message)
 CosmicDesktopGLView::CosmicDesktopGLView(BRect frame)
 	:
 	BGLView(frame, "CosmicDesktopGLView", B_FOLLOW_ALL, B_WILL_DRAW, BGL_RGB | BGL_DOUBLE | BGL_DEPTH),
-	fWidth(frame.Width()),
-	fHeight(frame.Height()),
+	fWidth(frame.Width() + 1),
+	fHeight(frame.Height() + 1),
 	fRotationSpeed(5.0f),
 	fRotationAngle(0.0f),
 	fDistance(0.0f),
@@ -341,7 +343,6 @@ CosmicDesktopGLView::InitializeRotationVector()
 void
 CosmicDesktopGLView::AttachedToWindow()
 {
-	BGLView::AttachedToWindow();
 	LockGL();
 
 	glEnable(GL_DEPTH_TEST);
@@ -351,7 +352,7 @@ CosmicDesktopGLView::AttachedToWindow()
 	// Capture screenshot and create texture
 	BScreen screen;
 	BBitmap* screenshot = new BBitmap(screen.Frame(), B_RGB32);
-	screen.ReadBitmap(screenshot, false, NULL);
+	screen.ReadBitmap(screenshot);
 
 	glGenTextures(1, &fTextureId);
 	glBindTexture(GL_TEXTURE_2D, fTextureId);
@@ -364,11 +365,13 @@ CosmicDesktopGLView::AttachedToWindow()
 	delete screenshot;
 
 	UnlockGL();
+
+	Draw();
 }
 
 
 void
-CosmicDesktopGLView::Draw(BRect updateRect)
+CosmicDesktopGLView::Draw()
 {
 	LockGL();
 
@@ -380,7 +383,7 @@ CosmicDesktopGLView::Draw(BRect updateRect)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0, 0, 2.11, 0, 0, 0, 0, 1, 0);
+	gluLookAt(0, 0, 2.12, 0, 0, 0, 0, 1, 0);
 
 	// Draw stars
 	DrawStars(fPreviewMode);
