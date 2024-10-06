@@ -7,3 +7,4 @@ A set of screensavers for the Haiku operating system written by neural networks 
 * [Dark City](/Dark%20City/about.md) - A dark city with traffic
 * [Snowfall](/Snowfall/about.md) - A beautiful snowfall screen saver
 * [Starfield](/Starfield/about.md) - A starry sky with orbiting teapots
+* [Lava Lamp](/Lava%20Lamp/about.md) - Simulates the mesmerizing motion of a lava lamp
