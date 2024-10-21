@@ -8,3 +8,4 @@ A set of screensavers for the Haiku operating system written by neural networks 
 * [Snowfall](/Snowfall/about.md) - A beautiful snowfall screen saver
 * [Starfield](/Starfield/about.md) - A starry sky with orbiting teapots
 * [Lava Lamp](/Lava%20Lamp/about.md) - Simulates the mesmerizing motion of a lava lamp
+* [ZX LOAD](/ZX%20LOAD/about.md) - ZX Spectrum loading screen simulation with desktop or zxart.ee images and CRT effects.
