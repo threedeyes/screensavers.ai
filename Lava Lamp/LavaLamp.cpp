@@ -609,8 +609,22 @@ void LavaLampGLView::Update() {
         blob.vy = std::max(std::min(blob.vy, maxSpeed), -maxSpeed);
 
         // Processing of reflection with the edges of the screen for blobs
-        if (blob.x < 0 || blob.x > fWidth) blob.vx *= -1;
-        if (blob.y < 0 || blob.y > fHeight) blob.vy *= -1;
+        if (blob.x < 0) {
+        	blob.x = 0.0f;
+        	blob.vx *= -1;
+        }
+        if (blob.x > fWidth) {
+        	blob.x = fWidth;
+        	blob.vx *= -1;
+        }
+        if (blob.y < 0) {
+        	blob.y = 0.0f;
+        	blob.vy *= -1;
+        }
+        if (blob.y > fHeight) {
+        	blob.y = fHeight;
+        	blob.vy *= -1;
+        }
     }
 
     // Updating the positions of bubbles
@@ -838,10 +852,10 @@ void LavaLampGLView::drawMetaballsTexture() {
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex2f(0, 0);
-    glTexCoord2f(1, 0); glVertex2f(fWidth, 0);
-    glTexCoord2f(1, 1); glVertex2f(fWidth, fHeight);
-    glTexCoord2f(0, 1); glVertex2f(0, fHeight);
+    glTexCoord2f(0, 0); glVertex2f(-5, -5);
+    glTexCoord2f(1, 0); glVertex2f(fWidth + 5, -5);
+    glTexCoord2f(1, 1); glVertex2f(fWidth + 5, fHeight + 5);
+    glTexCoord2f(0, 1); glVertex2f(-5, fHeight + 5);
     glEnd();
 
     glDisable(GL_BLEND);
