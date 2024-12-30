@@ -45,8 +45,8 @@ class PipesScreenSaver;
 class PipesConfigView : public BView {
 public:
     PipesConfigView(BRect frame, PipesScreenSaver* saver);
-    void AttachedToWindow() override;
-    void MessageReceived(BMessage* message) override;
+    void AttachedToWindow();
+    void MessageReceived(BMessage* message);
 
 private:
     PipesScreenSaver* fSaver;
@@ -63,7 +63,7 @@ private:
 class PipesGLView : public BGLView {
 public:
     PipesGLView(BRect frame);
-    void AttachedToWindow() override;
+    void AttachedToWindow();
     void Draw(BRect updateRect);
     void SetParameters(int32 pipeCount, float segmentLength, float pipeRadius);
 
@@ -86,12 +86,12 @@ private:
 class PipesScreenSaver : public BScreenSaver {
 public:
     PipesScreenSaver(BMessage* archive, image_id image);
-    void StartConfig(BView* view) override;
-    void StopSaver() override { };
-    status_t SaveState(BMessage* into) const override;
+    void StartConfig(BView* view);
+    void StopSaver() { };
+    status_t SaveState(BMessage* into) const;
     void RestoreState(BMessage* from);
-    status_t StartSaver(BView* view, bool preview) override;
-    void Draw(BView* view, int32 frame) override;
+    status_t StartSaver(BView* view, bool preview);
+    void Draw(BView* view, int32 frame);
 
     int32 GetPipeCount() { return fPipeCount; }
     float GetPipeRadius() { return fPipeRadius; }
@@ -255,7 +255,8 @@ void PipesGLView::AddNewPipe() {
 }
 
 void PipesGLView::UpdatePipes() {
-    for (auto& pipe : pipes) {
+    for (int i = 0; i < pipes.size(); i++) {
+        Pipe& pipe = pipes[i];
         Point3D& last = pipe.segments.back();
         Point3D nextPoint = last;  // Initialize next point as the current segment position
         bool moved = false;
@@ -327,7 +328,8 @@ void PipesGLView::UpdatePipes() {
         // If the pipe could not move in any direction, destroy it and create a new one
         if (!moved) {
             // Free up the grid cells occupied by the current pipe
-            for (const auto& segment : pipe.segments) {
+            for (int i = 0; i < pipe.segments.size(); i++) {
+                Point3D segment = pipe.segments[i];
                 grid[(int)roundf(segment.x + GRID_SIZE / 2)]
                     [(int)roundf(segment.y + GRID_SIZE / 2)]
                     [(int)roundf(segment.z + GRID_SIZE / 2)] = false;
@@ -359,7 +361,8 @@ void PipesGLView::UpdatePipes() {
 }
 
 void PipesGLView::DrawPipes() {
-    for (const auto& pipe : pipes) {
+    for (int i = 0; i < pipes.size(); i++) {
+        Pipe& pipe = pipes[i];
         glColor3f(pipe.r, pipe.g, pipe.b);
         for (size_t i = 1; i < pipe.segments.size(); ++i) {
             DrawPipeSegment(pipe.segments[i-1], pipe.segments[i]);
@@ -424,7 +427,7 @@ void PipesGLView::DrawJoint(const Point3D& prev, const Point3D& current, const P
 // Implementation of PipesScreenSaver
 
 PipesScreenSaver::PipesScreenSaver(BMessage* archive, image_id image)
-    : BScreenSaver(archive, image), fGLView(nullptr),
+    : BScreenSaver(archive, image), fGLView(NULL),
       fPipeCount(10), fSegmentLength(1.0f), fPipeRadius(0.1f) {
         RestoreState(archive);
 }
@@ -442,7 +445,7 @@ status_t PipesScreenSaver::SaveState(BMessage* into) const {
 
 void PipesScreenSaver::RestoreState(BMessage* from)
 {
-    if (from != nullptr) {
+    if (from != NULL) {
         if (from->FindInt32("pipe_count", &fPipeCount) != B_OK)
             fPipeCount = 10;
         if (from->FindFloat("pipe_radius", &fPipeRadius) != B_OK)
