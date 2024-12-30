@@ -27,6 +27,8 @@
 #include <vector>
 #include <cmath>
 
+#define MAX_DISTANCE 1.5f
+
 class CosmicDesktopConfigView;
 class CosmicDesktopGLView;
 
@@ -93,8 +95,6 @@ private:
 		return x * x * (3 - 2 * x);
 	}
 
-	static constexpr float		MAX_DISTANCE = 1.5f;
-
 	float						fWidth;
 	float						fHeight;
 	float						fAspectRatio;
@@ -117,7 +117,7 @@ private:
 CosmicDesktopSaver::CosmicDesktopSaver(BMessage* archive, image_id image)
 	:
 	BScreenSaver(archive, image),
-	fGLView(nullptr),
+	fGLView(NULL),
 	fRotationSpeed(5.0f),
 	fWobbleAmplitude(0.05f)
 {
@@ -319,7 +319,7 @@ CosmicDesktopGLView::CosmicDesktopGLView(BRect frame)
 	fWobbleAmplitude(0.05f)
 {
 	fAspectRatio = fWidth / fHeight;
-	srand(static_cast<unsigned int>(time(nullptr)));
+	srand(static_cast<unsigned int>(time(NULL)));
 	InitializeRotationVector();
 }
 
