@@ -77,7 +77,7 @@ public:
         }
     }
 
-    void AttachedToWindow() override {
+    void AttachedToWindow() {
         BGLView::AttachedToWindow();
 
         LockGL();
@@ -111,7 +111,7 @@ public:
         UnlockGL();
     }
 
-	void Draw(BRect updateRect) override {
+	void Draw(BRect updateRect) {
 		LockGL();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -187,13 +187,14 @@ private:
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		
+
 		if (fIsPreview) {
 			glPointSize(1.2f);
 			glBegin(GL_POINTS);
 		}
-		
-		for (auto& star : stars) {
+
+		for (int i = 0; i < stars.size(); i++) {
+			Star& star = stars[i];
 			MoveStar(star);
 			SetStarColor(star);
 
@@ -244,7 +245,8 @@ private:
 	}
 
     void DrawTeapots() {
-        for (auto& teapot : teapots) {
+        for (int i = 0; i < teapots.size(); i++) {
+            Teapot& teapot = teapots[i];
             MoveTeapot(teapot);
             DrawTeapot(teapot);
         }
@@ -337,10 +339,10 @@ class StarfieldScreenSaver : public BScreenSaver {
 public:
     StarfieldScreenSaver(BMessage* archive, image_id image);
 
-    void StartConfig(BView* view) override;
-    status_t SaveState(BMessage* into) const override;
-    status_t StartSaver(BView* view, bool preview) override;
-    void Draw(BView* view, int32 frame) override;
+    void StartConfig(BView* view);
+    status_t SaveState(BMessage* into) const;
+    status_t StartSaver(BView* view, bool preview);
+    void Draw(BView* view, int32 frame);
     int32 NumStars();
     int32 NumTeapots();
     float StarSpeed();
@@ -418,14 +420,14 @@ public:
         layout->AddView(infoScrollView);
     }
 
-    void AttachedToWindow() override {
+    void AttachedToWindow() {
         fStarsSlider->SetTarget(this);
         fTeapotsSlider->SetTarget(this);
         fStarSpeedSlider->SetTarget(this);
         fTeapotSpeedSlider->SetTarget(this);
     }
 
-    void MessageReceived(BMessage* message) override {
+    void MessageReceived(BMessage* message) {
         switch (message->what) {
             case kMsgSetStars:
                 fScreenSaver->SetNumStars(fStarsSlider->Value());
@@ -460,8 +462,8 @@ private:
 };
 
 StarfieldScreenSaver::StarfieldScreenSaver(BMessage* archive, image_id image)
-        : BScreenSaver(archive, image), fGLView(nullptr), fConfigView(nullptr) {
-    if (archive != nullptr) {
+        : BScreenSaver(archive, image), fGLView(NULL), fConfigView(NULL) {
+    if (archive != NULL) {
         if (archive->FindInt32("num_stars", &fNumStars) != B_OK)
             fNumStars = 300;
         if (archive->FindInt32("num_teapots", &fNumTeapots) != B_OK)
