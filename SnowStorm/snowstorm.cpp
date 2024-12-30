@@ -1,5 +1,5 @@
 /*
- * Snowfall Screensaver for Haiku
+ * Snowstorm Screensaver for Haiku
  *
  * A customizable snowfall screensaver with interactive snowdrifts.
  * This screensaver simulates falling snowflakes with adjustable parameters
@@ -37,12 +37,12 @@
 #include <cmath>
 #include <algorithm>
 
-constexpr int MAX_SNOWFLAKES = 500;
-constexpr float MAX_FPS = 60.0f;
-constexpr float BRANCH_ANGLE = M_PI / 6.0f;
-constexpr float LENGTH_DECREASE = 0.6f;
-constexpr int MIN_BRANCH_LEVELS = 1;
-constexpr int MAX_BRANCH_LEVELS = 3;
+#define MAX_SNOWFLAKES 500
+#define MAX_FPS 60.0f
+#define BRANCH_ANGLE (M_PI / 6.0f)
+#define LENGTH_DECREASE 0.6f
+#define MIN_BRANCH_LEVELS 1
+#define MAX_BRANCH_LEVELS 3
 
 struct Snowflake {
     float x, y;
@@ -55,16 +55,16 @@ struct Snowflake {
     int branchLevels;
 };
 
-class SnowflakeScreenSaver;
+class SnowStormScreenSaver;
 
-class SnowflakeConfigView : public BView {
+class SnowStormConfigView : public BView {
 public:
-    SnowflakeConfigView(BRect frame, SnowflakeScreenSaver* saver);
-    void AttachedToWindow() override;
-    void MessageReceived(BMessage* message) override;
+    SnowStormConfigView(BRect frame, SnowStormScreenSaver* saver);
+    void AttachedToWindow();
+    void MessageReceived(BMessage* message);
 
 private:
-    SnowflakeScreenSaver* fSaver;
+    SnowStormScreenSaver* fSaver;
     BStringView* fNameStringView;
     BSlider* fCountSlider;
     BSlider* fSizeSlider;
@@ -74,17 +74,17 @@ private:
 	BTextView* fInfoTextView;
 };
 
-class SnowflakeScreenSaver : public BScreenSaver {
+class SnowStormScreenSaver : public BScreenSaver {
 public:
-    SnowflakeScreenSaver(BMessage* message, image_id id);
-    void Draw(BView* view, int32 frame) override;
-    status_t StartSaver(BView* view, bool preview) override;
-    void StopSaver() override;
-    void StartConfig(BView* view) override;
-    status_t SaveState(BMessage* into) const override;
+    SnowStormScreenSaver(BMessage* message, image_id id);
+    void Draw(BView* view, int32 frame);
+    status_t StartSaver(BView* view, bool preview);
+    void StopSaver() { };
+    void StartConfig(BView* view);
+    status_t SaveState(BMessage* into) const;
     void RestoreState(BMessage* from);
 
-    void SetSnowflakeCount(int32 count) { snowflakeCount = std::min(count, MAX_SNOWFLAKES); ApplySettings(); }
+    void SetSnowflakeCount(int32 count) { snowflakeCount = MIN(count, MAX_SNOWFLAKES); ApplySettings(); }
     void SetMaxSnowflakeSize(float size) { maxSnowflakeSize = size; minSnowflakeSize = size * 0.5f; ApplySettings(); }
     void SetWindAmplitude(float amplitude) { windAmplitude = amplitude; ApplySettings(); }
     void SetMaxSnowflakeSpeed(float speed) { maxSnowflakeSpeed = speed; minSnowflakeSpeed = speed * 0.5f; ApplySettings(); }
@@ -125,16 +125,16 @@ private:
 
 extern "C" _EXPORT BScreenSaver* instantiate_screen_saver(BMessage* msg, image_id id)
 {
-    return new SnowflakeScreenSaver(msg, id);
+    return new SnowStormScreenSaver(msg, id);
 }
 
-SnowflakeConfigView::SnowflakeConfigView(BRect frame, SnowflakeScreenSaver* saver)
-    : BView(frame, "SnowflakeConfigView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+SnowStormConfigView::SnowStormConfigView(BRect frame, SnowStormScreenSaver* saver)
+    : BView(frame, "SnowStormConfigView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
       fSaver(saver)
 {
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-    fNameStringView = new BStringView("nameString", "A beautiful snowfall screen saver");
+    fNameStringView = new BStringView("nameString", "A beautiful snowstorm screen saver");
     fNameStringView->SetFont(be_bold_font);
 
     fCountSlider = new BSlider("countSlider", "Snowflake Count:", new BMessage('SNCN'), 50, MAX_SNOWFLAKES, B_HORIZONTAL);
@@ -173,7 +173,7 @@ SnowflakeConfigView::SnowflakeConfigView(BRect frame, SnowflakeScreenSaver* save
     layout->AddView(infoScrollView);
 }
 
-void SnowflakeConfigView::AttachedToWindow()
+void SnowStormConfigView::AttachedToWindow()
 {
     fCountSlider->SetTarget(this);
     fSizeSlider->SetTarget(this);
@@ -188,7 +188,7 @@ void SnowflakeConfigView::AttachedToWindow()
     fShowSnowdriftsCheckBox->SetValue(fSaver->GetShowSnowdrifts());
 }
 
-void SnowflakeConfigView::MessageReceived(BMessage* message)
+void SnowStormConfigView::MessageReceived(BMessage* message)
 {
     switch (message->what)
     {
@@ -201,8 +201,8 @@ void SnowflakeConfigView::MessageReceived(BMessage* message)
     }   
 }
 
-SnowflakeScreenSaver::SnowflakeScreenSaver(BMessage* message, image_id id)
-    : BScreenSaver(message, id), lastFrameTime(0), glView(nullptr),
+SnowStormScreenSaver::SnowStormScreenSaver(BMessage* message, image_id id)
+    : BScreenSaver(message, id), lastFrameTime(0), glView(NULL),
       snowflakeCount(250),
       minSnowflakeSize(2.0f),
       maxSnowflakeSize(10.0f),
@@ -213,18 +213,18 @@ SnowflakeScreenSaver::SnowflakeScreenSaver(BMessage* message, image_id id)
 	  showSnowdrifts(true),
 	  seetleActive(false)
 {
-    srand(static_cast<unsigned int>(time(nullptr)));
+    srand(static_cast<unsigned int>(time(NULL)));
     RestoreState(message);
     snowflakes.reserve(MAX_SNOWFLAKES);
 }
 
-void SnowflakeScreenSaver::StartConfig(BView* view)
+void SnowStormScreenSaver::StartConfig(BView* view)
 {
-	SnowflakeConfigView *configView = new SnowflakeConfigView(view->Bounds(), this);
+	SnowStormConfigView *configView = new SnowStormConfigView(view->Bounds(), this);
     view->AddChild(configView);
 }
 
-void SnowflakeScreenSaver::Draw(BView* view, int32 frame)
+void SnowStormScreenSaver::Draw(BView* view, int32 frame)
 {
     if (!glView) return;
 
@@ -240,16 +240,16 @@ void SnowflakeScreenSaver::Draw(BView* view, int32 frame)
     if (showSnowdrifts) {
         UpdateSnowdrifts();
     }	
-    DrawSnowflakes();
 	if (showSnowdrifts) {
 		DrawSnowdrifts();
 	}
+    DrawSnowflakes();
 
     glView->SwapBuffers();
     glView->UnlockGL();
 }
 
-status_t SnowflakeScreenSaver::StartSaver(BView* view, bool preview)
+status_t SnowStormScreenSaver::StartSaver(BView* view, bool preview)
 {
     windowWidth = view->Bounds().IntegerWidth() + 1;
     windowHeight = view->Bounds().IntegerHeight() + 1;
@@ -277,23 +277,20 @@ status_t SnowflakeScreenSaver::StartSaver(BView* view, bool preview)
     return B_OK;
 }
 
-void SnowflakeScreenSaver::StopSaver()
-{
-}
-
-void SnowflakeScreenSaver::ApplySettings()
+void SnowStormScreenSaver::ApplySettings()
 {
     InitializeSnowflakes();
 }
 
-void SnowflakeScreenSaver::InitializeSnowflakes()
+void SnowStormScreenSaver::InitializeSnowflakes()
 {
     snowflakes.clear();
     snowflakes.resize(snowflakeCount);
     
     float k = 1920.0f / windowWidth;
 
-    for (auto& snowflake : snowflakes) {
+    for (int i = 0; i < snowflakes.size(); ++i) {
+        Snowflake& snowflake = snowflakes[i];
         snowflake.x = static_cast<float>(rand() % windowWidth);
         snowflake.y = static_cast<float>(rand() % windowHeight);
         snowflake.size = (minSnowflakeSize + static_cast<float>(rand()) / RAND_MAX * (maxSnowflakeSize - minSnowflakeSize)) / k;
@@ -308,12 +305,13 @@ void SnowflakeScreenSaver::InitializeSnowflakes()
     snowdrifts.resize(windowWidth, 0);    
 }
 
-void SnowflakeScreenSaver::UpdateSnowflakes(float deltaTime)
+void SnowStormScreenSaver::UpdateSnowflakes(float deltaTime)
 {
     double currentTime = system_time() / 1000000.0;
     double k = 1920.0 / windowWidth;
     
-    for (auto& snowflake : snowflakes) {
+    for (int i = 0; i < snowflakes.size(); ++i) {
+        Snowflake& snowflake = snowflakes[i];
         snowflake.x += (windAmplitude / k) * std::cos(currentTime + snowflake.windOffset) * deltaTime;
         snowflake.angle += snowflake.angularSpeed * deltaTime;
         snowflake.y -= snowflake.speed * deltaTime;
@@ -343,10 +341,11 @@ void SnowflakeScreenSaver::UpdateSnowflakes(float deltaTime)
     }
 }
 
-void SnowflakeScreenSaver::DrawSnowflakes()
+void SnowStormScreenSaver::DrawSnowflakes()
 {
     glColor3f(1.0f, 1.0f, 1.0f);
-    for (const auto& snowflake : snowflakes) {
+    for (int i = 0; i < snowflakes.size(); ++i) {
+        Snowflake& snowflake = snowflakes[i];
         glPushMatrix();
         glTranslatef(snowflake.x, snowflake.y, 0);
         glRotatef(snowflake.angle * 180.0f / M_PI, 0, 0, 1);
@@ -363,7 +362,7 @@ void SnowflakeScreenSaver::DrawSnowflakes()
     }
 }
 
-void SnowflakeScreenSaver::DrawBranch(float length, int level)
+void SnowStormScreenSaver::DrawBranch(float length, int level)
 {
     if (level == 0) return;
 
@@ -385,7 +384,7 @@ void SnowflakeScreenSaver::DrawBranch(float length, int level)
     glPopMatrix();
 }
 
-void SnowflakeScreenSaver::DrawSnowdrifts()
+void SnowStormScreenSaver::DrawSnowdrifts()
 {
     glColor3f(1.0f, 1.0f, 1.0f);
     glBegin(GL_TRIANGLE_STRIP);
@@ -396,7 +395,7 @@ void SnowflakeScreenSaver::DrawSnowdrifts()
     glEnd();
 }
 
-void SnowflakeScreenSaver::UpdateSnowdrifts()
+void SnowStormScreenSaver::UpdateSnowdrifts()
 {
     const float maxHeight = windowHeight * 0.5f;
     const float settleFactor = 0.33f;
@@ -446,7 +445,7 @@ void SnowflakeScreenSaver::UpdateSnowdrifts()
     }
 }
 
-status_t SnowflakeScreenSaver::SaveState(BMessage* into) const
+status_t SnowStormScreenSaver::SaveState(BMessage* into) const
 {
     into->AddInt32("snowflakeCount", snowflakeCount);
     into->AddFloat("maxSnowflakeSize", maxSnowflakeSize);
@@ -456,9 +455,9 @@ status_t SnowflakeScreenSaver::SaveState(BMessage* into) const
     return B_OK;
 }
 
-void SnowflakeScreenSaver::RestoreState(BMessage* from)
+void SnowStormScreenSaver::RestoreState(BMessage* from)
 {
-    if (from != nullptr) {
+    if (from != NULL) {
         if (from->FindInt32("snowflakeCount", &snowflakeCount) != B_OK)
             snowflakeCount = 250;
         if (from->FindFloat("maxSnowflakeSize", &maxSnowflakeSize) != B_OK)

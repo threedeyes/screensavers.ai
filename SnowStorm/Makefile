@@ -1,7 +1,7 @@
-NAME = Snowfall
+NAME = SnowStorm
 TYPE = SHARED
-APP_MIME_SIG = application/x-vnd.SnowfallScreensaver-AI
-SRCS = snowfall.cpp
+APP_MIME_SIG = application/x-vnd.SnowStormScreensaver-AI
+SRCS = snowstorm.cpp
 LIBS = $(STDCPPLIBS) be screensaver GL GLU
 OPTIMIZE := FULL
 
