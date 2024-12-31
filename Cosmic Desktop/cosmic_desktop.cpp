@@ -343,6 +343,8 @@ CosmicDesktopGLView::InitializeRotationVector()
 void
 CosmicDesktopGLView::AttachedToWindow()
 {
+	BGLView::AttachedToWindow();
+
 	LockGL();
 
 	glEnable(GL_DEPTH_TEST);
