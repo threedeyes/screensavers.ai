@@ -398,7 +398,7 @@ CosmicDesktopGLView::Draw()
 	GLfloat lightPos[] = { 1.0f, 1.0f, 2.0f, 0.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
-	// Increase ambient light for better visibility
+	// Ambient light for better visibility
 	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
 
@@ -416,7 +416,7 @@ CosmicDesktopGLView::Draw()
 
 	glBindTexture(GL_TEXTURE_2D, fTextureId);
 
-	// Enable blending for transparency
+	// Enable blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -427,32 +427,29 @@ CosmicDesktopGLView::Draw()
 
 	glBegin(GL_QUADS);
 
-	// Front face (no transparency)
+	// Front face
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glTexCoord2f(0, 1); glVertex3f(-halfWidth, -halfHeight, halfWidth);
 	glTexCoord2f(1, 1); glVertex3f(halfWidth, -halfHeight, halfWidth);
 	glTexCoord2f(1, 0); glVertex3f(halfWidth, halfHeight, halfWidth);
 	glTexCoord2f(0, 0); glVertex3f(-halfWidth, halfHeight, halfWidth);
 
-	// Back face (semi-transparent)
+	// Back face
 	glNormal3f(0.0f, 0.0f, -1.0f);
-	glColor4f(1.0f, 1.0f, 1.0f, 0.8f); // 80% opacity
 	glTexCoord2f(1, 1); glVertex3f(-halfWidth, -halfHeight, -halfWidth);
 	glTexCoord2f(1, 0); glVertex3f(-halfWidth, halfHeight, -halfWidth);
 	glTexCoord2f(0, 0); glVertex3f(halfWidth, halfHeight, -halfWidth);
 	glTexCoord2f(0, 1); glVertex3f(halfWidth, -halfHeight, -halfWidth);
 
-	// Right face (semi-transparent)
+	// Right face
 	glNormal3f(1.0f, 0.0f, 0.0f);
-	glColor4f(1.0f, 1.0f, 1.0f, 0.8f); // 80% opacity
 	glTexCoord2f(1, 1); glVertex3f(halfWidth, -halfHeight, -halfWidth);
 	glTexCoord2f(1, 0); glVertex3f(halfWidth, halfHeight, -halfWidth);
 	glTexCoord2f(0, 0); glVertex3f(halfWidth, halfHeight, halfWidth);
 	glTexCoord2f(0, 1); glVertex3f(halfWidth, -halfHeight, halfWidth);
 
-	// Left face (semi-transparent)
+	// Left face
 	glNormal3f(-1.0f, 0.0f, 0.0f);
-	glColor4f(1.0f, 1.0f, 1.0f, 0.8f); // 80% opacity
 	glTexCoord2f(0, 1); glVertex3f(-halfWidth, -halfHeight, -halfWidth);
 	glTexCoord2f(1, 1); glVertex3f(-halfWidth, -halfHeight, halfWidth);
 	glTexCoord2f(1, 0); glVertex3f(-halfWidth, halfHeight, halfWidth);
