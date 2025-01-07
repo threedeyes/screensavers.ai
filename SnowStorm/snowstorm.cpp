@@ -43,6 +43,7 @@
 #define LENGTH_DECREASE 0.6f
 #define MIN_BRANCH_LEVELS 1
 #define MAX_BRANCH_LEVELS 3
+#define SCALE_WIDTH (1920.0f / windowWidth)
 
 struct Snowflake {
     float x, y;
@@ -287,14 +288,12 @@ void SnowStormScreenSaver::InitializeSnowflakes()
     snowflakes.clear();
     snowflakes.resize(snowflakeCount);
     
-    float k = 1920.0f / windowWidth;
-
     for (int i = 0; i < snowflakes.size(); ++i) {
         Snowflake& snowflake = snowflakes[i];
         snowflake.x = static_cast<float>(rand() % windowWidth);
         snowflake.y = static_cast<float>(rand() % windowHeight);
-        snowflake.size = (minSnowflakeSize + static_cast<float>(rand()) / RAND_MAX * (maxSnowflakeSize - minSnowflakeSize)) / k;
-        snowflake.speed = (minSnowflakeSpeed + static_cast<float>(rand()) / RAND_MAX * (maxSnowflakeSpeed - minSnowflakeSpeed)) / k;
+        snowflake.size = (minSnowflakeSize + static_cast<float>(rand()) / RAND_MAX * (maxSnowflakeSize - minSnowflakeSize)) / SCALE_WIDTH;
+        snowflake.speed = (minSnowflakeSpeed + static_cast<float>(rand()) / RAND_MAX * (maxSnowflakeSpeed - minSnowflakeSpeed)) / SCALE_WIDTH;
         snowflake.angle = static_cast<float>(rand()) / RAND_MAX * 2 * M_PI;
         snowflake.angularSpeed = static_cast<float>(rand()) / RAND_MAX * 2 * maxAngularSpeed - maxAngularSpeed;
         snowflake.windOffset = static_cast<float>(rand()) / RAND_MAX * 2 * M_PI;
@@ -308,13 +307,12 @@ void SnowStormScreenSaver::InitializeSnowflakes()
 void SnowStormScreenSaver::UpdateSnowflakes(float deltaTime)
 {
     double currentTime = system_time() / 1000000.0;
-    double k = 1920.0 / windowWidth;
     
     for (int i = 0; i < snowflakes.size(); ++i) {
         Snowflake& snowflake = snowflakes[i];
-        snowflake.x += (windAmplitude / k) * std::cos(currentTime + snowflake.windOffset) * deltaTime;
-        snowflake.angle += snowflake.angularSpeed * deltaTime;
-        snowflake.y -= snowflake.speed * deltaTime;
+        snowflake.x += (windAmplitude / SCALE_WIDTH) * std::cos(currentTime + snowflake.windOffset) * deltaTime;
+        snowflake.angle += snowflake.angularSpeed * deltaTime * 0.03;
+        snowflake.y -= snowflake.speed * deltaTime * (snowflake.size * SCALE_WIDTH * 0.08);
 
 		if (showSnowdrifts) {
 	        if (snowflake.x >= 0 && snowflake.x < windowWidth && snowflake.y < windowHeight) {
@@ -343,9 +341,10 @@ void SnowStormScreenSaver::UpdateSnowflakes(float deltaTime)
 
 void SnowStormScreenSaver::DrawSnowflakes()
 {
-    glColor3f(1.0f, 1.0f, 1.0f);
     for (int i = 0; i < snowflakes.size(); ++i) {
         Snowflake& snowflake = snowflakes[i];
+        float bright = snowflake.size / (maxSnowflakeSize / SCALE_WIDTH);
+        glColor3f(bright, bright, bright);
         glPushMatrix();
         glTranslatef(snowflake.x, snowflake.y, 0);
         glRotatef(snowflake.angle * 180.0f / M_PI, 0, 0, 1);
